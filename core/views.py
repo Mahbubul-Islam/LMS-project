@@ -32,7 +32,7 @@ def category_list_create(request):
         else:
             return Response(serializer.errors, status=400)
   
-@api_view['GET','POST']      
+@api_view(['GET','POST'])      
 def course_list_create(request):
     if request.method == 'GET':
         category = request.query_params.get('category')
@@ -48,7 +48,7 @@ def course_list_create(request):
                 Q(description_icontains = search)
             )
         
-        if request.user.is_authenticated and request.role == 'teacher':
+        if request.user.is_authenticated and request.user.role == 'teacher':
             queryset = queryset.filter(instructor = request.user)
             
         paginator = PageNumberPagination()
@@ -62,5 +62,17 @@ def course_list_create(request):
         )
         
         return paginator.get_paginated_response(serializer.data)
+    elif request.method == 'POST':
+        if not request.user.is_authenticated and request.user.role != 'teacher':
+            return Response({'detail' : 'Only teacher can create courses'})
+        serializer = CouseSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=201)
+        
+        return Response(serializer.errors, status=400)
+
+        
 
         
