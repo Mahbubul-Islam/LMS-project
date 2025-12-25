@@ -10,25 +10,25 @@ class CategorySerializer(serializers.ModelSerializer):
 class CouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
-        field = '__all__'
+        fields = '__all__'
         
         
 class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
-        field = '__all__'
+        fields = '__all__'
         
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
         model = Material
-        field = '__all__'
+        fields = '__all__'
         
 class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
-        field = '__all__'
+        fields = '__all__'
         
 class QuestionAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionAnswer
-        field = '__all__'
+        fields = '__all__'
