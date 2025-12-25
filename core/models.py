@@ -16,6 +16,7 @@ class Course(models.Model):
     description = models.TextField()
     banner = models.ImageField(upload_to='media/course_banner/')
     price = models.FloatField()
+    duration = models.FloatField()
     is_activate = models.BooleanField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE )
     instructor = models.ForeignKey(User, on_delete=models.CASCADE)
