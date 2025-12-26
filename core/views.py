@@ -73,6 +73,7 @@ def course_list_create(request):
         
         return Response(serializer.errors, status=400)
 
+        
 @api_view(['GET', 'POST'])
 def lesson_list_create(request):
     if request.method == 'GET':
@@ -120,7 +121,57 @@ def lesson_list_create(request):
             return Response(serializer.data,status=201)
         
         return Response(serializer.errors, status=400)
+    
+    
+@api_view(['GET', 'POST'])
+def material_list_create(request):
+    if request.method == 'GET':
+        lesson = request.query_params.get('lessonId')
+        if not lesson:
+            return Response({'detail' : 'lesson id is required'}, status=400)
+        try:
+            lesson = Lesson.objects.get(pk = lesson)
+        except Lesson.DoesNotExist:
+            return Response({'detail' : 'Lesson not found!'})
         
+        course = lesson.course
+        
+        is_teacher = request.user.is_authenticated and request.user.role == 'teacher' and request.user == course.instructor
+        
+        is_admin = request.user.is_authenticated and request.user.role == 'admin'
+        
+        is_enrolled = Enrollment.objects.filter(
+            student = request.user,
+            course = course,
+            status = 'active'
+        ).exists() if request.user.is_authenticated and request.user.role == 'student' else False
+        
+        if not (is_teacher or is_admin or is_enrolled):
+            return Response({'detail' : "you don't have permission to view these material"},status=401)
+        
+        materials = Material.objects.filter(course = course)
+        serializer = MaterialSerializer(materials, many = True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        course = request.query_params.get('lessonId')
+        if not course:
+            return Response({'detail' : 'course id is required'}, status=400)
+        try:
+            course = Course.objects.get(pk = course)
+        except Course.DoesNotExist:
+            return Response({'detail' : 'Course not found!'})
+        
+        if request.user != course.instructor:
+            return Response({'detail' : 'you can only add lesson to your own courses!'})
+        
+        serializer = LessonSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=201)
+        
+        return Response(serializer.errors, status=400)
         
             
 
