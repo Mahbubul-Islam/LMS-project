@@ -86,7 +86,7 @@ def lesson_list_create(request):
         
         is_teacher = request.user.is_authenticated and request.user.role == 'teacher'  and request.user == course.instructor
         
-        is_admin = request.user.is_authenticated and request.user.role == 'admin'  and request.user == course.instructor
+        is_admin = request.user.is_authenticated and request.user.role == 'admin'
         
         is_enrolled = Enrollment.objects.filter(
             student = request.user,
@@ -102,7 +102,7 @@ def lesson_list_create(request):
         return Response(serializer.data)
     
     elif request.method == 'POST':
-        course = request.query_params.get('courseId')
+        course = request.query_params.get('lessonId')
         if not course:
             return Response({'detail' : 'course id is required'}, status=400)
         try:
